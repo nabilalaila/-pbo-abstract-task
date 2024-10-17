@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Data;
+using System.Security.Cryptography.X509Certificates;
 
 class Program
 {
@@ -17,27 +18,29 @@ class Program
 
         Console.WriteLine("Kemampuan Perbaikan");
         Perbaikan perbaikan = new Perbaikan();
-        KepalaRobot.GunakanKemampuan(perbaikan);
+        KepalaRobot.GunakanKemampuan(perbaikan, KepalaRobot);
         perbaikan.UpdateCooldown();
         Console.WriteLine();
 
         Console.WriteLine("Kemampuan Electric Shock");
         ElectricShock electricShock = new ElectricShock();
-        KepalaRobot.GunakanKemampuan(electricShock);
+        KepalaRobot.GunakanKemampuan(electricShock, musuh);
         electricShock.UpdateCooldown();
         Console.WriteLine();
 
         Console.WriteLine("Kemampuan Plasma Cannon");
         PlasmaCannon plasmaCannon = new PlasmaCannon();
-        musuh.GunakanKemampuan(plasmaCannon);
+        musuh.GunakanKemampuan(plasmaCannon, musuh);
         plasmaCannon.UpdateCooldown();
         Console.WriteLine();
 
         Console.WriteLine("Kemampuan Supershield");
         SuperShield superShield = new SuperShield();
-        KepalaRobot.GunakanKemampuan(superShield);
+        KepalaRobot.GunakanKemampuan(superShield, musuh);
         superShield.UpdateCooldown();
         Console.WriteLine();
+
+        aturanMain aturan = new aturanMain();
 
         Console.WriteLine("Serangan Bos Robot");
         KepalaRobot.Serang(musuh);
@@ -51,6 +54,9 @@ class Program
         musuh.tembakBeruntun(KepalaRobot);
         Console.WriteLine();
 
+        Console.WriteLine("Mencoba memulihkan energi setelah sesi");
+        aturan.pulihkanEnergi(KepalaRobot, musuh);
+
         Console.WriteLine("Update terbaru Bos Robot");
         KepalaRobot.cetakInformasi();
         Console.WriteLine();
@@ -60,10 +66,12 @@ class Program
         Console.WriteLine();
         
         Console.WriteLine("Percobaan kemampuan saat cooldown");
-        KepalaRobot.GunakanKemampuan(perbaikan);
-        KepalaRobot.GunakanKemampuan(electricShock);
-        musuh.GunakanKemampuan(plasmaCannon);
-        KepalaRobot.GunakanKemampuan(superShield);
+        KepalaRobot.GunakanKemampuan(perbaikan, KepalaRobot);
+        KepalaRobot.GunakanKemampuan(electricShock, musuh);
+        musuh.GunakanKemampuan(plasmaCannon, musuh);
+        KepalaRobot.GunakanKemampuan(superShield, musuh);
+        
+        aturan.kemenangan(KepalaRobot, musuh);
     }
 }
 
@@ -98,7 +106,7 @@ public abstract class Robot
         }
     }
 
-    public abstract void GunakanKemampuan(Ikemampuan kemampuan);
+    public abstract void GunakanKemampuan(Ikemampuan kemampuan, Robot target);
 
     public void cetakInformasi()
     {
@@ -113,9 +121,9 @@ public class BosRobot : Robot
     { 
     }
 
-    public override void GunakanKemampuan(Ikemampuan kemampuan)
+    public override void GunakanKemampuan(Ikemampuan kemampuan, Robot target)
     {
-        kemampuan.GunakanKemampuan(this, this);
+        kemampuan.GunakanKemampuan(this, target);
     }
     public void diserang(Robot penyerang, Robot target)
     {
@@ -139,7 +147,6 @@ public class BosRobot : Robot
     {
         Console.WriteLine($"Bos robot {nama} dah mati");
     }
-
 }
 
 public class Perbaikan : Ikemampuan
@@ -222,7 +229,7 @@ public class PlasmaCannon : Ikemampuan
         if (hitungCooldown == 0 && penyerang.energi >= 100)
         {
             target.armor -= 50;
-            Console.WriteLine($"Robot {target.nama} melakukan serangan tembakan plasma. Energi Sekarag : {target.energi}\nEnergi musuh : {target.energi}");
+            Console.WriteLine($"Robot {target.nama} melakukan serangan tembakan plasma. Armor Sekarang : {target.armor}\nArmor musuh : {target.armor}");
             hitungCooldown = Cooldown;
         }
         else
@@ -287,9 +294,30 @@ public class RobotMiliter : Robot
         }
     }
 
-    public override void GunakanKemampuan(Ikemampuan kemampuan)
+    public override void GunakanKemampuan(Ikemampuan kemampuan, Robot target)
     {
-        kemampuan.GunakanKemampuan(this, this);
+        kemampuan.GunakanKemampuan(this, target);
 
+    }
+}
+
+public class aturanMain
+{
+    public void pulihkanEnergi(Robot penyerang, Robot target)
+    {
+        penyerang.energi += 30;
+    }
+
+    public void kemenangan(Robot penyerang, Robot target)
+    {
+        if (penyerang.energi == 0)
+        {
+            Console.WriteLine("GAME OVER!!");
+        }
+        else if (target.energi == 0)
+        {
+            Console.WriteLine("CONGRATULATION!! YOU'RE THE WINNER");
+        }
+        else { }
     }
 }
