@@ -68,7 +68,7 @@ class Program
         Console.WriteLine("Percobaan kemampuan saat cooldown");
         KepalaRobot.GunakanKemampuan(perbaikan, KepalaRobot);
         KepalaRobot.GunakanKemampuan(electricShock, musuh);
-        musuh.GunakanKemampuan(plasmaCannon, musuh);
+        musuh.GunakanKemampuan(plasmaCannon, KepalaRobot);
         KepalaRobot.GunakanKemampuan(superShield, musuh);
         
         aturan.kemenangan(KepalaRobot, musuh);
@@ -229,7 +229,7 @@ public class PlasmaCannon : Ikemampuan
         if (hitungCooldown == 0 && penyerang.energi >= 100)
         {
             target.armor -= 50;
-            Console.WriteLine($"Robot {target.nama} melakukan serangan tembakan plasma. Armor Sekarang : {target.armor}\nArmor musuh : {target.armor}");
+            Console.WriteLine($"Robot {penyerang.nama} melakukan serangan tembakan plasma. Armor Sekarang : {penyerang.armor}\nArmor musuh : {target.armor}");
             hitungCooldown = Cooldown;
         }
         else
@@ -254,7 +254,7 @@ public class SuperShield : Ikemampuan
         Cooldown = 3; hitungCooldown=0;
     }
 
-    public void GunakanKemampuan( Robot penyerang, Robot target)
+    public void GunakanKemampuan(Robot penyerang, Robot target)
     {
         penyerang.armor += 20;
         Console.WriteLine($"Armor telah ditingkatkan menjadi {penyerang.armor}");
