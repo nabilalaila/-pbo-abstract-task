@@ -30,7 +30,7 @@ class Program
 
         Console.WriteLine("Kemampuan Plasma Cannon");
         PlasmaCannon plasmaCannon = new PlasmaCannon();
-        musuh.GunakanKemampuan(plasmaCannon, musuh);
+        musuh.GunakanKemampuan(plasmaCannon, KepalaRobot);
         plasmaCannon.UpdateCooldown();
         Console.WriteLine();
 
